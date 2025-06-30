@@ -1,14 +1,20 @@
+name: Deploy a Staging
+
+on:
+  push:
+    branches: [main]
+
 jobs:
   deploy:
     name: Despliegue a Staging
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
 
       - name: Descargar artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: resultado-build
 
@@ -18,8 +24,8 @@ jobs:
           cat build.txt
 
       - name: Notificar Éxito (Issue)
-        uses: actions/github-script@v7
         if: success()
+        uses: actions/github-script@v7
         with:
           script: |
             await github.issues.create({
@@ -30,8 +36,8 @@ jobs:
             });
 
       - name: Notificar Error (Issue)
-        uses: actions/github-script@v7
         if: failure()
+        uses: actions/github-script@v7
         with:
           script: |
             await github.issues.create({

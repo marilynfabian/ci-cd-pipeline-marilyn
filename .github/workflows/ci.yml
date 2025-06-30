@@ -7,38 +7,34 @@ on:
 
 jobs:
   test:
-    name: Test en Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [18.x, 20.x, 22.x]
+      fail-fast: false
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
 
-      - name: Usar Node.js ${{ matrix.node-version }}
+      - name: Configurar Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Cache npm
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+      - name: Instalar dependencias
+        run: npm install
 
-      - run: npm ci
-      - run: npm test
+      - name: Ejecutar tests
+        run: npm test
 
-      - name: Generar artifact
-        run: |
-          mkdir -p artifacts
-          echo "Resultado del build simulado" > artifacts/build.txt
+      - name: Crear archivo build simulado
+        if: matrix.node-version == '20.x'
+        run: echo "Resultado de build para deploy" > build.txt
 
       - name: Subir artifact
-        uses: actions/upload-artifact@v4
+        if: matrix.node-version == '20.x'
+        uses: actions/upload-artifact@v3
         with:
           name: resultado-build
-          path: artifacts/
+          path: build.txt
