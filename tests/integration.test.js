@@ -20,10 +20,9 @@ describe('Tests de integración', () => {
   });
 
   test('Comportamiento ante falta de parámetros y luego uso correcto', async () => {
-   
     const fallo = await request(app).get('/multiplicar?a=7');
-    expect(fallo.statusCode).toBe(200);
-    expect(fallo.body.resultado).toBeNaN();
+    expect(fallo.statusCode).toBe(400);
+    expect(fallo.body.error).toBe("Parámetros inválidos");
 
     const exito = await request(app).get('/multiplicar?a=7&b=3');
     expect(exito.statusCode).toBe(200);
